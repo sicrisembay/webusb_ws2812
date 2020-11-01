@@ -1,4 +1,6 @@
+BOARD := stm32f302custom
 TINYUSB_PATH := $(shell realpath components/tinyusb)
+
 include $(TINYUSB_PATH)/tools/top.mk
 include $(TINYUSB_PATH)/examples/make.mk
 
