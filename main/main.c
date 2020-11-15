@@ -37,6 +37,8 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 
+#include "ws2812b.h"
+
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
 //--------------------------------------------------------------------+
@@ -82,6 +84,8 @@ void cdc_task(void);
 int main(void)
 {
     board_init();
+
+    ws2812b_init();
 
     // Create a task for tinyusb device stack
     (void) xTaskCreateStatic( usb_device_task, "usbd", USBD_STACK_SIZE, NULL, configMAX_PRIORITIES-1, usb_device_stack, &usb_device_taskdef);
