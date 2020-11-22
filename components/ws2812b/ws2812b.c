@@ -20,12 +20,35 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define TEST_WS2812B                (1)
+#define TEST_WS2812B                (0)
 
 #define WS2812B_BITS_PER_PIXEL      (24)
+#define REFRESH_INTERVAL_MS         (1000/WS2812B_REFRESH_RATE_HZ)
+
+// Library structures
+// ******************
+// This value sets number of periods to generate 50uS Treset signal
+#define WS2812_RESET_PERIOD 12
+
+typedef struct WS2812_BufferItem {
+    uint8_t* frameBufferPointer;
+    uint32_t frameBufferSize;
+    uint32_t frameBufferCounter;
+    uint8_t channel;    // digital output pin/channel
+} WS2812_BufferItem;
+
+
+
+typedef struct WS2812_Struct
+{
+    WS2812_BufferItem item[WS2812_BUFFER_COUNT];
+    uint8_t transferComplete;
+    uint32_t timerPeriodCounter;
+    uint32_t repeatCounter;
+} WS2812_Struct;
 
 // static task for ws2812
-#define WS2812_STACK_SIZE      (3*configMINIMAL_STACK_SIZE)
+#define WS2812_STACK_SIZE      (384)
 StackType_t  ws2812_stack[WS2812_STACK_SIZE];
 TaskHandle_t ws2812_taskHdl;
 StaticTask_t ws2812_taskdef;
@@ -34,6 +57,7 @@ StaticTask_t ws2812_taskdef;
 #define EVENT_BIT_TRANSFER_COMPLETE     (0x02UL)
 
 static WS2812_Struct ws2812b;
+static ws2812_color_t colorBuffer[WS2812B_NUMBER_OF_LEDS];
 
 // Define source arrays for my DMAs
 uint32_t WS2812_IO_High[] =  { WS2812B_GPIO_PIN(WS2812B_PIN) };
@@ -61,17 +85,18 @@ const uint8_t gammaTable[] = {
   177,180,182,184,186,189,191,193,196,198,200,203,205,208,210,213,
   215,218,220,223,225,228,231,233,236,239,241,244,247,249,252,255 };
 
-TIM_HandleTypeDef    Tim2Handle;
-TIM_OC_InitTypeDef tim2OC1;
-TIM_OC_InitTypeDef tim2OC2;
-uint32_t tim_period;
-
 static void DMA_TransferCompleteHandler(DMA_HandleTypeDef *DmaHandle);
 static void DMA_TransferHalfHandler(DMA_HandleTypeDef *DmaHandle);
 static void ws2812b_set_pixel(uint8_t row, uint16_t column, uint8_t red, uint8_t green, uint8_t blue);
 
+TIM_HandleTypeDef Tim2Handle;
+uint32_t tim_period;
+
 static void TIM2_init(void)
 {
+    TIM_OC_InitTypeDef tim2OC1;
+    TIM_OC_InitTypeDef tim2OC2;
+
     // TIM2 Periph clock enable
     __HAL_RCC_TIM2_CLK_ENABLE();
 
@@ -446,52 +471,45 @@ static void ws2812b_set_pixel(uint8_t row, uint16_t column, uint8_t red, uint8_t
 
 // Test Start --->
 #if (TEST_WS2812B)
-static uint8_t frameBuff[3*WS2812B_NUMBER_OF_LEDS];
-// Helper defines
-#define newColor(r, g, b) (((uint32_t)(r) << 16) | ((uint32_t)(g) <<  8) | (b))
-#define Red(c) ((uint8_t)((c >> 16) & 0xFF))
-#define Green(c) ((uint8_t)((c >> 8) & 0xFF))
-#define Blue(c) ((uint8_t)(c & 0xFF))
+ws2812_color_t Wheel(uint8_t WheelPos) {
+    ws2812_color_t color;
+    WheelPos = 255 - WheelPos;
+    if(WheelPos < 85) {
+        color.red = (uint8_t)(255 - WheelPos * 3);
+        color.green = (uint8_t)0;
+        color.blue = (uint8_t)(WheelPos * 3);
+        return color;
+    }
+    if(WheelPos < 170) {
+        WheelPos -= 85;
+        color.red = (uint8_t)0;
+        color.green = (uint8_t)(WheelPos * 3);
+        color.blue = (uint8_t)(255 - WheelPos * 3);
+        return color;
+    }
 
-void visInit() {
-    // Set output channel/pin, GPIO_PIN_0 = 0, for GPIO_PIN_5 = 5 - this has to correspond to WS2812B_PINS
-    ws2812b.item[0].channel = WS2812B_PIN;
-    // Your RGB framebuffer
-    ws2812b.item[0].frameBufferPointer = frameBuff;
-    // RAW size of framebuffer
-    ws2812b.item[0].frameBufferSize = sizeof(frameBuff);
+    WheelPos -= 170;
+    color.red = (uint8_t)(WheelPos * 3);
+    color.green = (uint8_t)(255 - WheelPos * 3);
+    color.blue = (uint8_t)0;
+    return color;
 }
 
-uint32_t Wheel(uint8_t WheelPos) {
-  WheelPos = 255 - WheelPos;
-  if(WheelPos < 85) {
-    return newColor(255 - WheelPos * 3, 0, WheelPos * 3);
-  }
-  if(WheelPos < 170) {
-    WheelPos -= 85;
-    return newColor(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
-  WheelPos -= 170;
-  return newColor(WheelPos * 3, 255 - WheelPos * 3, 0);
-}
-
-void visRainbow(uint8_t *frameBuffer, uint32_t frameBufferSize, uint32_t effectLength)
+void visRainbow(const uint32_t numberOfLed, uint32_t effectLength)
 {
     uint32_t i;
     static uint8_t x = 0;
+    ws2812_color_t color;
 
     x += 1;
 
     if(x == 256*5)
         x = 0;
 
-    for( i = 0; i < frameBufferSize / 3; i++)
+    for( i = 0; i < numberOfLed; i++)
     {
-        uint32_t color = Wheel(((i * 256) / effectLength + x) & 0xFF);
-
-        frameBuffer[i*3 + 0] = color & 0xFF;
-        frameBuffer[i*3 + 1] = color >> 8 & 0xFF;
-        frameBuffer[i*3 + 2] = color >> 16 & 0xFF;
+        color = Wheel(((i * 256) / effectLength + x) & 0xFF);
+        ws2812b_write_color(i, color);
     }
 }
 
@@ -503,14 +521,15 @@ void visHandle()
     }
 
     vTaskDelayUntil(&timestamp, 10);
-    visRainbow(frameBuff, sizeof(frameBuff), 15);
+    visRainbow(WS2812B_NUMBER_OF_LEDS, WS2812B_NUMBER_OF_LEDS);
 }
 #endif /* TEST_WS2812B */
 // <--- Test End
 
-void ws2812_task(void * params)
+static void ws2812_task(void * params)
 {
     BaseType_t xResult;
+    BaseType_t timestamp;
     uint32_t ulNotifyValue;
     (void) params;
 
@@ -521,11 +540,20 @@ void ws2812_task(void * params)
     // Need to start the first transfer
     ws2812b.transferComplete = 1;
 
+    // Set output channel/pin, GPIO_PIN_0 = 0, for GPIO_PIN_5 = 5 - this has to correspond to WS2812B_PINS
+    ws2812b.item[0].channel = WS2812B_PIN;
+    // Your RGB framebuffer
+    ws2812b.item[0].frameBufferPointer = (uint8_t *)(colorBuffer);
+    // RAW size of framebuffer
+    ws2812b.item[0].frameBufferSize = sizeof(ws2812_color_t) * WS2812B_NUMBER_OF_LEDS;
+
     // Test Start -->
 #if (TEST_WS2812B)
-    visInit();
     visHandle();
-    ws2812b.startTransfer = 1;
+    WS2812_sendbuf();
+#else
+    memset((void *)colorBuffer, 0, sizeof(colorBuffer));
+    colorBuffer[0].green = 0xFF;
     WS2812_sendbuf();
 #endif /* TEST_WS2812B */
     // <-- Test End
@@ -534,11 +562,14 @@ void ws2812_task(void * params)
     while(1) {
         xResult = xTaskNotifyWait(pdFALSE, 0xFFFFFFFF, &ulNotifyValue, portMAX_DELAY);
         if(pdPASS == xResult) {
+            timestamp = xTaskGetTickCount();
             if(ulNotifyValue & EVENT_BIT_RESET_START) {
 // Test Start -->
 #if (TEST_WS2812B)
                 visHandle();
-                ws2812b.startTransfer = 1;
+                WS2812_sendbuf();
+#else
+                vTaskDelayUntil(&timestamp, REFRESH_INTERVAL_MS);
                 WS2812_sendbuf();
 #endif /* TEST_WS2812B */
 // <-- Test End
@@ -557,12 +588,13 @@ void ws2812b_init()
     ws2812_taskHdl = xTaskCreateStatic( ws2812_task, "ws2812", WS2812_STACK_SIZE, NULL, configMAX_PRIORITIES, ws2812_stack, &ws2812_taskdef);
 }
 
-
-void ws2812b_handle()
+void ws2812b_write_color(uint32_t id, ws2812_color_t color)
 {
-    if(ws2812b.startTransfer) {
-        ws2812b.startTransfer = 0;
-        WS2812_sendbuf();
+    ws2812_color_t * pColor;
+    if(id < WS2812B_NUMBER_OF_LEDS) {
+        pColor = &(colorBuffer[id]);
+        pColor->red = color.red;
+        pColor->green = color.green;
+        pColor->blue = color.blue;
     }
-
 }
