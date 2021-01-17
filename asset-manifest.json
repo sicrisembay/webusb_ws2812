@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/webusb_ws2812/static/css/main.8c8b27cf.chunk.css",
-    "main.js": "/webusb_ws2812/static/js/main.9367d7c8.chunk.js",
-    "main.js.map": "/webusb_ws2812/static/js/main.9367d7c8.chunk.js.map",
+    "main.js": "/webusb_ws2812/static/js/main.5b3379da.chunk.js",
+    "main.js.map": "/webusb_ws2812/static/js/main.5b3379da.chunk.js.map",
     "runtime-main.js": "/webusb_ws2812/static/js/runtime-main.96538659.js",
     "runtime-main.js.map": "/webusb_ws2812/static/js/runtime-main.96538659.js.map",
     "static/js/2.de16a499.chunk.js": "/webusb_ws2812/static/js/2.de16a499.chunk.js",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.96538659.js",
     "static/js/2.de16a499.chunk.js",
     "static/css/main.8c8b27cf.chunk.css",
-    "static/js/main.9367d7c8.chunk.js"
+    "static/js/main.5b3379da.chunk.js"
   ]
 }
