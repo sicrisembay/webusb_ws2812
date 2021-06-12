@@ -12,9 +12,11 @@ INC += \
 	$(TINYUSB_PATH)/$(FREERTOS_SRC)/include \
 	$(TINYUSB_PATH)/$(FREERTOS_SRC)/portable/GCC/$(FREERTOS_PORT)
 	
-# Example source
-EXAMPLE_SOURCE += $(wildcard main/*.c)
-SRC_C += $(addprefix $(CURRENT_PATH)/, $(EXAMPLE_SOURCE))
+# Main source
+SRC_C += \
+	main/main.c \
+	main/freertos_hook.c \
+	main/usb_descriptors.c
 
 # FreeRTOS source, all files in port folder
 SRC_C += \

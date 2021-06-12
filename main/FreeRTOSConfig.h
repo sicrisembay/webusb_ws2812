@@ -48,10 +48,10 @@
 extern uint32_t SystemCoreClock;
 
 /* Cortex M23/M33 port configuration. */
-#define configENABLE_MPU								        0
-#define configENABLE_FPU								        1
-#define configENABLE_TRUSTZONE					        0
-#define configMINIMAL_SECURE_STACK_SIZE					( 1024 )
+#define configENABLE_MPU                        0
+#define configENABLE_FPU                        1
+#define configENABLE_TRUSTZONE                  0
+#define configMINIMAL_SECURE_STACK_SIZE         ( 1024 )
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
@@ -76,43 +76,43 @@ extern uint32_t SystemCoreClock;
 #define configSUPPORT_DYNAMIC_ALLOCATION        0
 
 /* Hook function related definitions. */
-#define configUSE_IDLE_HOOK                    0
-#define configUSE_TICK_HOOK                    0
-#define configUSE_MALLOC_FAILED_HOOK           0 // cause nested extern warning
-#define configCHECK_FOR_STACK_OVERFLOW         2
+#define configUSE_IDLE_HOOK                     0
+#define configUSE_TICK_HOOK                     0
+#define configUSE_MALLOC_FAILED_HOOK            0 // cause nested extern warning
+#define configCHECK_FOR_STACK_OVERFLOW          2
 
 /* Run time and task stats gathering related definitions. */
-#define configGENERATE_RUN_TIME_STATS          0
-#define configUSE_TRACE_FACILITY               1 // legacy trace
-#define configUSE_STATS_FORMATTING_FUNCTIONS   0
+#define configGENERATE_RUN_TIME_STATS           0
+#define configUSE_TRACE_FACILITY                1 // legacy trace
+#define configUSE_STATS_FORMATTING_FUNCTIONS    0
 
 /* Co-routine definitions. */
-#define configUSE_CO_ROUTINES                  0
-#define configMAX_CO_ROUTINE_PRIORITIES        2
+#define configUSE_CO_ROUTINES                   0
+#define configMAX_CO_ROUTINE_PRIORITIES         2
 
 /* Software timer related definitions. */
-#define configUSE_TIMERS                       1
-#define configTIMER_TASK_PRIORITY              (configMAX_PRIORITIES-2)
-#define configTIMER_QUEUE_LENGTH               32
-#define configTIMER_TASK_STACK_DEPTH           configMINIMAL_STACK_SIZE
+#define configUSE_TIMERS                        0
+#define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES-2)
+#define configTIMER_QUEUE_LENGTH                32
+#define configTIMER_TASK_STACK_DEPTH            configMINIMAL_STACK_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */
-#define INCLUDE_vTaskPrioritySet               0
-#define INCLUDE_uxTaskPriorityGet              0
-#define INCLUDE_vTaskDelete                    0
-#define INCLUDE_vTaskSuspend                   1 // required for queue, semaphore, mutex to be blocked indefinitely with portMAX_DELAY
-#define INCLUDE_xResumeFromISR                 0
-#define INCLUDE_vTaskDelayUntil                1
-#define INCLUDE_vTaskDelay                     1
-#define INCLUDE_xTaskGetSchedulerState         0
-#define INCLUDE_xTaskGetCurrentTaskHandle      0
-#define INCLUDE_uxTaskGetStackHighWaterMark    0
-#define INCLUDE_xTaskGetIdleTaskHandle         0
-#define INCLUDE_xTimerGetTimerDaemonTaskHandle 0
-#define INCLUDE_pcTaskGetTaskName              0
-#define INCLUDE_eTaskGetState                  0
-#define INCLUDE_xEventGroupSetBitFromISR       0
-#define INCLUDE_xTimerPendFunctionCall         0
+#define INCLUDE_vTaskPrioritySet                0
+#define INCLUDE_uxTaskPriorityGet               0
+#define INCLUDE_vTaskDelete                     0
+#define INCLUDE_vTaskSuspend                    1 // required for queue, semaphore, mutex to be blocked indefinitely with portMAX_DELAY
+#define INCLUDE_xResumeFromISR                  0
+#define INCLUDE_vTaskDelayUntil                 1
+#define INCLUDE_vTaskDelay                      1
+#define INCLUDE_xTaskGetSchedulerState          0
+#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_uxTaskGetStackHighWaterMark     0
+#define INCLUDE_xTaskGetIdleTaskHandle          0
+#define INCLUDE_xTimerGetTimerDaemonTaskHandle  0
+#define INCLUDE_pcTaskGetTaskName               0
+#define INCLUDE_eTaskGetState                   0
+#define INCLUDE_xEventGroupSetBitFromISR        0
+#define INCLUDE_xTimerPendFunctionCall          0
 
 /* Define to trap errors during development. */
 // Halt CPU (breakpoint) when hitting error, only apply for Cortex M3, M4, M7
