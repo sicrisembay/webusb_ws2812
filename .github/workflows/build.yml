@@ -2,7 +2,7 @@ name: webusb_ws2812_build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
