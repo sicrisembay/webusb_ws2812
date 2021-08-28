@@ -42,4 +42,4 @@ jobs:
     - name: build
       run: |
         echo "PATH = $PATH"
-        eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -import "." -build webusb_ws2812/Debug -cleanBuild all
+        eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild  -data  "../"  -import "."  -cleanBuild all
