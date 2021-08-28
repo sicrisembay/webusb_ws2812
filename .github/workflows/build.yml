@@ -42,4 +42,5 @@ jobs:
     - name: build
       run: |
         echo "PATH = $PATH"
-        eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild  -data  "../"  -import "."  -cleanBuild all
+        mkdir -p $HOME/eclipse_workspace
+        eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild  -data  $HOME/eclipse_workspace  -import $GITHUB_WORKSPACE  -cleanBuild all
