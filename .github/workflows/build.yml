@@ -10,9 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Print workspace location
+    - name: Print Environment Variables
       run: |
         echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+        echo "HOME = $HOME"
 
     - name: Checkout
       uses: actions/checkout@v2
@@ -27,7 +28,10 @@ jobs:
       
     - name: download arm toolchain
       run: |
+        cd $GITHUB_WORKSPACE
+        cd ..
         wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | tar -xj
-        export PATH=$PATH:$GITHUB_WORKSPACE/gcc-arm-none-eabi-10-2020-q4-major/bin
+        export PATH=$PATH:$(pwd)/gcc-arm-none-eabi-10-2020-q4-major/bin
         echo "PATH = $PATH"
+        ls
                 
