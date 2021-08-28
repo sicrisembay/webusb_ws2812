@@ -10,18 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Print workspace location
+      run: |
+        echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+
     - name: Checkout
       uses: actions/checkout@v2
       with:
         submodules: true
-    
+
+    - name: list
+      run: ls
+
     - name: install dependencies
       run: sudo apt-get install -y openjdk-8-jre bzip2 wget
       
-    - name: download arm toolchain, eclipse and build
+    - name: download arm toolchain
       run: |
         wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | tar -xj
         export PATH=$PATH:$GITHUB_WORKSPACE/gcc-arm-none-eabi-10-2020-q4-major/bin
-        wget -c https://ftp.jaist.ac.jp/pub/eclipse/technology/epp/downloads/release/2020-12/R/eclipse-embedcpp-2020-12-R-linux-gtk-x86_64.tar.gz -O - |  tar -xz -C .
-        ./eclipse/eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild  -data  "../"  -import "."  -cleanBuild all
-        
+        echo "PATH = $PATH"
+                
