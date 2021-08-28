@@ -13,6 +13,7 @@ jobs:
     - name: Print Environment Variables
       run: |
         echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+        echo "GITHUB_PATH = $GITHUB_PATH"
         echo "HOME = $HOME"
 
     - name: Checkout
@@ -30,8 +31,9 @@ jobs:
       run: |
         cd $HOME
         wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | tar -xj
-        export PATH=$PATH:$(pwd)/gcc-arm-none-eabi-10-2020-q4-major/bin
+        echo "$(pwd)/gcc-arm-none-eabi-10-2020-q4-major/bin" >> $GITHUB_PATH
         echo "PATH = $PATH"
+        echo "GITHUB_PATH = $GITHUB_PATH"
 
     - name: download eclipse
       run: |
@@ -40,8 +42,10 @@ jobs:
         ls
         export PATH=$PATH:$(pwd)/eclipse
         echo "PATH = $PATH"
+        echo "GITHUB_PATH = $GITHUB_PATH"
         
     - name: build
       run: |
+        echo "PATH = $PATH"
         cd $GITHUB_WORKSPACE
         eclipse -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -import $GITHUB_WORKSPACE -build webusb_ws2812/Debug -cleanBuild all
