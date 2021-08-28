@@ -35,11 +35,11 @@ jobs:
 
     - name: download eclipse
       run: |
-        wget -c https://ftp.jaist.ac.jp/pub/eclipse/technology/epp/downloads/release/2020-12/R/eclipse-embedcpp-2020-12-R-linux-gtk-x86_64.tar.gz -O - |  tar -xz -C $HOME
+        wget -c -q https://ftp.jaist.ac.jp/pub/eclipse/technology/epp/downloads/release/2020-12/R/eclipse-embedcpp-2020-12-R-linux-gtk-x86_64.tar.gz -O - |  tar -xz -C $HOME
         echo "$HOME/eclipse" >> $GITHUB_PATH
         ls $HOME
 
     - name: build
       run: |
         echo "PATH = $PATH"
-        eclipse -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -import $GITHUB_WORKSPACE -build webusb_ws2812/Debug -cleanBuild all
+        eclipse --launcher.suppressErrors -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -import "." -build webusb_ws2812/Debug -cleanBuild all
