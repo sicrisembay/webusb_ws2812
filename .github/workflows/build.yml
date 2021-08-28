@@ -28,10 +28,20 @@ jobs:
       
     - name: download arm toolchain
       run: |
-        cd $GITHUB_WORKSPACE
-        cd ..
+        cd $HOME
         wget -qO- https://developer.arm.com/-/media/Files/downloads/gnu-rm/10-2020q4/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2 | tar -xj
         export PATH=$PATH:$(pwd)/gcc-arm-none-eabi-10-2020-q4-major/bin
         echo "PATH = $PATH"
+
+    - name: download eclipse
+      run: |
+        cd $HOME
+        wget -c https://ftp.jaist.ac.jp/pub/eclipse/technology/epp/downloads/release/2020-12/R/eclipse-embedcpp-2020-12-R-linux-gtk-x86_64.tar.gz -O - |  tar -xz -C .
         ls
-                
+        export PATH=$PATH:$(pwd)/eclipse
+        echo "PATH = $PATH"
+        
+    - name: build
+      run: |
+        cd $GITHUB_WORKSPACE
+        eclipse -nosplash -application org.eclipse.cdt.managedbuilder.core.headlessbuild -import $GITHUB_WORKSPACE -build webusb_ws2812/Debug -cleanBuild all
