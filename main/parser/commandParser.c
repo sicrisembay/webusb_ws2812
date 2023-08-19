@@ -53,6 +53,8 @@ static int32_t commandHandler(uint32_t length)
             break;
         }
     }
+
+    return 0;
 }
 
 void command_parser_init(void)

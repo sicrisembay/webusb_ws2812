@@ -213,7 +213,7 @@ static void loadNextFramebufferData(WS2812_BufferItem *bItem, uint32_t row)
 
 
 // Transmit the framebuffer
-static void WS2812_sendbuf()
+static void WS2812_sendbuf(void)
 {
     // transmission complete flag
     ws2812b.transferComplete = 0;
@@ -529,7 +529,7 @@ void visHandle()
 static void ws2812_task(void * params)
 {
     BaseType_t xResult;
-    BaseType_t timestamp;
+    TickType_t timestamp;
     uint32_t ulNotifyValue;
     (void) params;
 
@@ -582,7 +582,7 @@ static void ws2812_task(void * params)
 }
 
 
-void ws2812b_init()
+void ws2812b_init(void)
 {
     // Create Class task
     ws2812_taskHdl = xTaskCreateStatic( ws2812_task, "ws2812", WS2812_STACK_SIZE, NULL, configMAX_PRIORITIES, ws2812_stack, &ws2812_taskdef);

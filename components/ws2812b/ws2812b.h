@@ -16,7 +16,7 @@
 #define WS2812B_H_
 
 #include "webusb_ws2812_config.h"
-#include "stm32f3xx_hal_dma.h"
+#include "stm32f3xx_hal.h"
 
 typedef union {
     uint8_t raw[3];
@@ -29,7 +29,7 @@ typedef union {
 
 // Public functions
 // ****************
-void ws2812b_init();
+void ws2812b_init(void);
 void ws2812b_write_color(uint32_t id, ws2812_color_t color);
 
 #endif /* WS2812B_H_ */
